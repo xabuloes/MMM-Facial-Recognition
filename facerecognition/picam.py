@@ -23,6 +23,7 @@ class OpenCVCapture(Thread):
     def run(self):
         with picamera.PiCamera() as camera:
             camera.resolution = (620, 540)
+            camera.rotation = 270
             camera.framerate = 10
             stream = io.BytesIO()
             for stream in camera.capture_continuous(stream, format='jpeg', use_video_port=True):
@@ -54,6 +55,8 @@ class OpenCVCapture(Thread):
             self.lock.release()
 
         image = cv2.imdecode(data, 1)
+	with open('image.jpg','wb') as f:
+		f.write(image)
         return image
 
     def stop(self):

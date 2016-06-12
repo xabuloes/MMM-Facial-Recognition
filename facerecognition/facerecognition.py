@@ -79,9 +79,13 @@ while True:
     # if detecion is true, will be used to disable detection if you use a PIR sensor and no motion is detected
     if detection_active is True:
         # Get image
-        image = camera.read()
+	image = camera.read()
+	
+	if image is None:
+	    continue
+
         # Convert image to grayscale.
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         # Get coordinates of single face in captured image.
         result = face.detect_single(image)
         # No face found, logout user?

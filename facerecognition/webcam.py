@@ -24,11 +24,14 @@ class OpenCVCapture(object):
         device ID.
         """
         # Open the camera.
+        print "Trying to open camera device . . ."
         self._camera = cv2.VideoCapture(device_id)
         # self._camera.set(3,160)
         #self._camera.set(4,120)
         if not self._camera.isOpened():
             self._camera.open()
+
+        print "Camera is opened"
         # Start a thread to continuously capture frames.
         # This must be done because different layers of buffering in the webcam
         # and OS drivers will cause you to retrieve old frames if they aren't
