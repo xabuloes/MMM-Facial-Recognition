@@ -7,6 +7,9 @@
  * MIT Licensed.
  */
 
+// TOREMOVE
+console.log("INSTALLING FACIAL RECOGNITION");
+
 Module.register('MMM-Facial-Recognition',{
 	
 	defaults: {
@@ -85,8 +88,9 @@ Module.register('MMM-Facial-Recognition',{
 				this.logout_user()
 			}
 			if (payload.user == -1){
-				this.current_user = this.translate("stranger")
+				this.current_user = this.translate(this.config.everyoneClass)
 				this.current_user_id = payload.user;
+				this.login_user();
 			}
 			else{				
 				this.current_user = this.config.users[payload.user];
@@ -109,6 +113,14 @@ Module.register('MMM-Facial-Recognition',{
 					Log.log('Module is hidden.');
 				});
 			});
+		}
+		if(notification == 'USER_LEFT'){
+            console.log(self.name + ": The user left")
+            this.sendSocketNotification('USER_LEFT',{action: 'logout'})
+		}
+		if(notification == 'USER_DETECTED'){
+            console.log(self.name + ": A user was detected")
+            this.sendSocketNotification('USER_DETECTED',{action: 'login'})
 		}
 	},
 	

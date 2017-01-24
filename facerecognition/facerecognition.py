@@ -22,6 +22,7 @@ import cv2
 import config
 import signal
 
+
 def to_node(type, message):
     # convert to json and print (node helper will read from stdout)
     try:
@@ -62,29 +63,45 @@ to_node("status", 'Training data loaded!')
 # get camera
 camera = config.get_camera()
 
+
+def read_in():
+    lines = sys.stdin.readlines()
+    return lines
+
+
 def shutdown(self, signum):
     to_node("status", 'Shutdown: Cleaning up camera...')
     camera.stop()
     quit()
 
+
 signal.signal(signal.SIGINT, shutdown)
 
 # sleep for a second to let the camera warm up
-time.sleep(1)
+time.sleep(2)
 
 # Main Loop
 while True:
     # Sleep for x seconds specified in module config
-    time.sleep(config.get("interval"))
-    # if detecion is true, will be used to disable detection if you use a PIR sensor and no motion is detected
+    #    time.sleep(config.get("interval"))
+    # if detection is true, will be used to disable detection if you use a PIR sensor and no motion is detected
+    to_node("status", current_user)
+    if current_user is not None:
+        to_node("status", "Waiting for stdin input.")
+        lines = read_in()
+        for line in lines:
+            to_node('status', line)
+
     if detection_active is True:
         # Get image
-	image = camera.read()
-	
-	if image is None:
-	    continue
+        image = camera.read()
+
+        if image is None:
+            continue
 
         # Convert image to grayscale.
+        # TOREMOVE
+        to_node("status", 'taking a picture...')
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         # Get coordinates of single face in captured image.
         result = face.detect_single(image)
@@ -111,17 +128,17 @@ while True:
             # Set login time
             login_timestamp = time.time()
             # Routine to count how many times the same user is detected
-            if (label == last_match and same_user_detected_in_row < 2):
-                # if same user as last time increment same_user_detected_in_row +1
-                same_user_detected_in_row += 1
-            if label != last_match:
-                # if the user is diffrent reset same_user_detected_in_row back to 0
-                same_user_detected_in_row = 0
+            #           if (label == last_match and same_user_detected_in_row < 2):
+            # if same user as last time increment same_user_detected_in_row +1
+            #                same_user_detected_in_row += 1
+            #            if label != last_match:
+            # if the user is diffrent reset same_user_detected_in_row back to 0
+            #                same_user_detected_in_row = 0
             # A user only gets logged in if he is predicted twice in a row minimizing prediction errors.
-            if (label != current_user and same_user_detected_in_row > 1):
-                current_user = label
-                # Callback current user to node helper
-                to_node("login", {"user": label, "confidence": str(confidence)})
+            #            if (label != current_user and same_user_detected_in_row > 1):
+            current_user = label
+            # Callback current user to node helper
+            to_node("login", {"user": label, "confidence": str(confidence)})
             # set last_match to current prediction
             last_match = label
         # if label is -1 or 0, current_user is not already set to unknown and last prediction match was at least 5 seconds ago
@@ -130,7 +147,7 @@ while True:
             # Set login time
             login_timestamp = time.time()
             # set current_user to unknown
-            current_user = 0
+            current_user = None
             # callback to node helper
             to_node("login", {"user": current_user, "confidence": None})
         else:

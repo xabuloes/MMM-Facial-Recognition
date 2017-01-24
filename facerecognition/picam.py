@@ -22,7 +22,7 @@ class OpenCVCapture(Thread):
 
     def run(self):
         with picamera.PiCamera() as camera:
-            camera.resolution = (620, 540)
+            camera.resolution = (1000, 1000)
             camera.rotation = 270
             camera.framerate = 10
             stream = io.BytesIO()
